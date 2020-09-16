@@ -1,0 +1,25 @@
+language: python
+
+cache: pip
+
+dist: xenial
+
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9-dev"
+  - "pypy3"
+
+before_install:
+  - python -m pip install --upgrade pip
+  - python -m pip install --upgrade pytest
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - python -m pytest
+
+notifications:
+  slack: greynir:38FfPr1S8oZRNFMmt47mzT3z
