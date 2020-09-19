@@ -27,6 +27,9 @@ from aiohttp import web
 
 from reynir import NounPhrase
 
+
+__version__ = 0.1
+
 routes = web.RouteTableDef()
 
 
@@ -53,11 +56,20 @@ async def lemmatize(request):
 @routes.get("/")
 async def hello(request):
     return web.Response(
-        text="<html><center><h1>Greynir API Server</h1></center></html>",
+        text=f"<html><center>"
+        "<img src='static/greynir.png' style='max-width: 240px;'>"
+        "<h1>Greynir API Server</h1>"
+        "<p>version {__version__}</p>"
+        "</center></html>",
         content_type="text/html",
     )
 
 
+STATIC_FOLDER = "static/"
+routes.static("/static", STATIC_FOLDER)
+
+
 app = web.Application()
 app.add_routes(routes)
+
 web.run_app(app)
