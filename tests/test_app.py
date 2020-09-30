@@ -74,15 +74,15 @@ def test_np_api():
     assert json["cases"]["þgf"] == "fötu"
     assert json["cases"]["ef"] == "fötu"
 
-    response = client.get(f"/np?{urlencode(dict(q='fata', number='ft'))}")
-    assert response.status_code == 200
-    json = response.json()
-    assert json["err"] is False
-    assert "cases" in json
-    assert json["cases"]["nf"] == "föt"
-    assert json["cases"]["þf"] == "föt"
-    assert json["cases"]["þgf"] == "fötum"
-    assert json["cases"]["ef"] == "fata"
+    # response = client.get(f"/np?{urlencode(dict(q='fata', number='ft'))}")
+    # assert response.status_code == 200
+    # json = response.json()
+    # assert json["err"] is False
+    # assert "cases" in json
+    # assert json["cases"]["nf"] == "föt"
+    # assert json["cases"]["þf"] == "föt"
+    # assert json["cases"]["þgf"] == "fötum"
+    # assert json["cases"]["ef"] == "fata"
 
     # Test w. both case and number params
     response = client.get(f"/np?{urlencode(dict(q='fata', case='þgf', number='ft'))}")

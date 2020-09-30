@@ -66,7 +66,7 @@ def np(q: str = None, case: Optional[str] = None, number: Optional[str] = None):
     try:
         resp["q"] = q
 
-        n = NounPhrase(q)
+        n = NounPhrase(q, force_number=number)
 
         cases = dict()
         if case:
