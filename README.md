@@ -2,17 +2,18 @@
 
 This web application provides a REST API for the Greynir NLP parser.
 
-Implemented in Python 3.6+ using the FastAPI framework.
+Implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
 
-Runs via uvicorn or any ASGI-compliant server.
+Runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
 
 
 ## Setup
 
-Create a Python virtual environment repo root (requires Python 3.6 or later).
+Create a Python virtual environment repo root (requires Python 3.6 or later, 
+[PyPy](https://pypi.org/) or CPython).
 
 ```
-$ virtualenv -p /path/to/python3 venv
+$ virtualenv -p /path/to/python venv
 ```
 
 Activate virtual environment:
@@ -29,14 +30,13 @@ $ pip install -r requirements.txt
 
 ## Running web application
 
-After activating the virtual environment, run the following command from the
-repo root to launch the server:
+After activating the virtual environment, run the following command from the repo root:
 
 ```
 $ uvicorn main:app
 ```
 
-Defaults to running on `localhost:8000`
+Defaults to running on `[localhost:8000](http://localhost:8000)`
 
 ## API documentation
 
@@ -57,7 +57,8 @@ A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 The full text of the GNU General Public License v3 is
 [included here](https://github.com/mideind/Greynir/blob/master/LICENSE.txt)
-and also available here: [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
+and also available here: 
+[https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
 
 If you wish to use this set of programs in ways that are not covered under the
 GNU GPLv3 license, please contact us at [mideind@mideind.is](mailto:mideind@mideind.is)
