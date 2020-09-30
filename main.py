@@ -27,7 +27,7 @@ from typing import Optional
 from fastapi import FastAPI
 
 from reynir import NounPhrase
-
+from reynir import tokenize, TOK
 
 __version__ = 0.1
 
@@ -35,9 +35,9 @@ __version__ = 0.1
 app = FastAPI()
 
 
-@app.get("/")
-def root():
-    return "Welcome to the Greynir API server."
+# @app.get("/")
+# def root():
+#     return "Welcome to the Greynir API server."
 
 
 CASES = {"nf": "nominative", "þf": "accusative", "þgf": "dative", "ef": "genitive"}
@@ -46,6 +46,7 @@ NUMBERS = frozenset(("et", "ft"))
 
 @app.get("/np")
 def np(q: str = None, case: Optional[str] = None, number: Optional[str] = None):
+    """ Noun phrase declension API. """
     if not q:
         return {"err": True, "errmsg": "Missing query parameter"}
 
@@ -87,6 +88,29 @@ def np(q: str = None, case: Optional[str] = None, number: Optional[str] = None):
     return resp
 
 
+_SKIP_TOKENS = frozenset((TOK.S_BEGIN, TOK.S_END, TOK.PUNCTUATION))
+
+
 @app.get("/lemmas")
-def lemmas():
-    pass
+def lemmas(q: str = None):
+    """ Lemmatization API. """
+    # TODO: Validate q param length
+    if not q:
+        return {"err": True, "errmsg": "Missing query parameter"}
+
+    lem = list()
+
+    for t in tokenize(q):
+        if t.kind in _SKIP_TOKENS or not t.val:
+            continue
+        m = t.val[0]
+        if hasattr(m, "kind"):
+            m = m.kind.replace("-", "")
+        lem.append(m)
+
+    resp = dict()
+    resp["err"] = False
+    resp["q"] = q
+    resp["lemmas"] = lem
+
+    return resp

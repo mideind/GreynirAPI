@@ -30,7 +30,7 @@ client = TestClient(app)
 
 
 def test_np_api():
-    """ Test noun phrase API ("/np"). """
+    """ Test noun phrase API ("/np" route). """
 
     # Test without params
     response = client.get("/np")
@@ -91,3 +91,7 @@ def test_np_api():
     assert json["err"] is False
     assert "cases" in json
     assert json["cases"]["þgf"] == "fötum"
+
+
+def test_lemma_api():
+    pass
