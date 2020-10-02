@@ -22,7 +22,7 @@
 
 """
 
-from typing import Optional
+from typing import List, Dict, Union, Optional
 
 from fastapi import FastAPI
 
@@ -35,7 +35,7 @@ __version__ = 0.1
 app = FastAPI()
 
 
-def _err(msg):
+def _err(msg: str) -> Dict[str, Union[str, bool]]:
     return {"err": True, "errmsg": msg}
 
 
@@ -49,7 +49,7 @@ NUMBERS = frozenset(("et", "ft"))
 
 
 @app.get("/np")
-def np(q: str = None, case: Optional[str] = None, force_number: Optional[str] = None):
+def np(q: Optional[str] = None, case: Optional[str] = None, force_number: Optional[str] = None):
     """ Noun phrase declension API. """
     if not q:
         return _err("Missing query parameter")
@@ -63,13 +63,14 @@ def np(q: str = None, case: Optional[str] = None, force_number: Optional[str] = 
             f"Invalid force_number param: '{force_number}'. Valid numbers are: {', '.join(NUMBERS)}"
         )
 
-    resp = {}
+    resp: Dict[str, Union[str, bool, Dict[str, str]]] = {}
+
     try:
         resp["q"] = q
 
         n = NounPhrase(q, force_number=force_number)
 
-        cases = dict()
+        cases: Dict[str, str] = dict()
         if case:
             cases[case] = getattr(n, CASES[case])
         else:
@@ -93,14 +94,14 @@ _MAX_LEM_TXT_LEN = 4096
 
 
 @app.get("/lemmas")
-def lemmas(q: str = None):
+def lemmas(q: Optional[str] = None):
     """ Lemmatization API. """
     if not q:
         return _err("Missing query parameter")
     if len(q) > _MAX_LEM_TXT_LEN:
-        return _err("Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
+        return _err(f"Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
 
-    lem = list()
+    lem: List[str] = list()
 
     # Consume from generator
     for t in tokenize(q):
@@ -113,11 +114,12 @@ def lemmas(q: str = None):
             if hasattr(m, "stofn"):
                 lem.append(m.stofn.replace("-", ""))
             elif hasattr(m, "name"):
+                # !!! Might want to split the name?
                 lem.append(m.name)
             else:
                 lem.append(t.txt)
 
-    resp = dict()
+    resp: Dict[str, Union[str, bool, List[str]]] = dict()
     resp["err"] = False
     resp["q"] = q
     resp["lemmas"] = lem
