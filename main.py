@@ -110,8 +110,8 @@ def lemmas(q: str = None):
             lem.append(t.txt)
         else:
             m = t.val[0]
-            if hasattr(m, "kind"):
-                lem.append(m.kind.replace("-", ""))
+            if hasattr(m, "stofn"):
+                lem.append(m.stofn.replace("-", ""))
             elif hasattr(m, "name"):
                 lem.append(m.name)
             else:
