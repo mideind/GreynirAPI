@@ -35,6 +35,10 @@ __version__ = 0.1
 app = FastAPI()
 
 
+def _err(msg):
+    return {"err": True, "errmsg": msg}
+
+
 # @app.get("/")
 # def root():
 #     return "Welcome to the Greynir API server."
@@ -45,29 +49,25 @@ NUMBERS = frozenset(("et", "ft"))
 
 
 @app.get("/np")
-def np(q: str = None, case: Optional[str] = None, number: Optional[str] = None):
+def np(q: str = None, case: Optional[str] = None, force_number: Optional[str] = None):
     """ Noun phrase declension API. """
     if not q:
-        return {"err": True, "errmsg": "Missing query parameter"}
+        return _err("Missing query parameter")
 
     ckeys = CASES.keys()
     if case and case not in ckeys:
-        return {
-            "err": True,
-            "errmsg": f"Invalid case: '{case}'. Valid cases are: {', '.join(ckeys)}",
-        }
+        return _err(f"Invalid case: '{case}'. Valid cases are: {', '.join(ckeys)}")
 
-    if number and number not in NUMBERS:
-        return {
-            "err": True,
-            "errmsg": f"Invalid number: '{number}'. Valid numbers are: {', '.join(NUMBERS)}",
-        }
+    if force_number and force_number not in NUMBERS:
+        return _err(
+            f"Invalid force_number param: '{force_number}'. Valid numbers are: {', '.join(NUMBERS)}"
+        )
 
     resp = {}
     try:
         resp["q"] = q
 
-        n = NounPhrase(q, force_number=number)
+        n = NounPhrase(q, force_number=force_number)
 
         cases = dict()
         if case:
@@ -89,24 +89,33 @@ def np(q: str = None, case: Optional[str] = None, number: Optional[str] = None):
 
 
 _SKIP_TOKENS = frozenset((TOK.S_BEGIN, TOK.S_END, TOK.PUNCTUATION))
+_MAX_LEM_TXT_LEN = 4096
 
 
 @app.get("/lemmas")
 def lemmas(q: str = None):
     """ Lemmatization API. """
-    # TODO: Validate q param length
     if not q:
-        return {"err": True, "errmsg": "Missing query parameter"}
+        return _err("Missing query parameter")
+    if len(q) > _MAX_LEM_TXT_LEN:
+        return _err("Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
 
     lem = list()
 
+    # Consume from generator
     for t in tokenize(q):
-        if t.kind in _SKIP_TOKENS or not t.val:
+        if t.kind in _SKIP_TOKENS:
             continue
-        m = t.val[0]
-        if hasattr(m, "kind"):
-            m = m.kind.replace("-", "")
-        lem.append(m)
+        if not t.val:
+            lem.append(t.txt)
+        else:
+            m = t.val[0]
+            if hasattr(m, "kind"):
+                lem.append(m.kind.replace("-", ""))
+            elif hasattr(m, "name"):
+                lem.append(m.name)
+            else:
+                lem.append(t.txt)
 
     resp = dict()
     resp["err"] = False
