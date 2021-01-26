@@ -1,4 +1,4 @@
-fastapi>=0.61.1
-reynir>=2.6.0
-requests>=2.24
-uvicorn>=0.12.1
+fastapi>=0.63.0
+reynir>=2.9.0
+requests>=2.25.1
+uvicorn>=0.13.3
