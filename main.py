@@ -3,9 +3,7 @@
 
     GreynirAPI: Web application that exposes the Greynir API
 
-    Main web application module
-
-    Copyright (C) 2020 Miðeind ehf.
+    Copyright (C) 2021 Miðeind ehf.
 
        This program is free software: you can redistribute it and/or modify
        it under the terms of the GNU General Public License as published by
@@ -20,11 +18,14 @@
     along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
+    Main web application module
+
 """
 
 from typing import List, Dict, Union, Optional
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
 from reynir import NounPhrase
 from reynir import tokenize, TOK
@@ -39,9 +40,17 @@ def _err(msg: str) -> Dict[str, Union[str, bool]]:
     return {"err": True, "errmsg": msg}
 
 
-# @app.get("/")
-# def root():
-#     return "Welcome to the Greynir API server."
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return """
+<html>
+    <head><title>Greynir API Server v{0}</title></head>
+    <body>
+        <h1>Greynir API Server v{0}</h1>
+        <ul><li><a href="/docs">Documentation</a></li></ul>
+    </body>
+</html>
+""".format(__version__)
 
 
 CASES = {"nf": "nominative", "þf": "accusative", "þgf": "dative", "ef": "genitive"}
