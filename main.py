@@ -27,13 +27,14 @@ from typing import List, Dict, Union, Optional
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from reynir import NounPhrase
-from reynir import tokenize, TOK
+from reynir import Greynir, NounPhrase, tokenize, TOK
+
 
 __version__ = 0.1
 
 
 app = FastAPI()
+greynir = None
 
 
 def _err(msg: str) -> Dict[str, Union[str, bool]]:
@@ -50,7 +51,9 @@ def root():
         <ul><li><a href="/docs">Documentation</a></li></ul>
     </body>
 </html>
-""".format(__version__)
+""".format(
+        __version__
+    )
 
 
 CASES = {"nf": "nominative", "þf": "accusative", "þgf": "dative", "ef": "genitive"}
@@ -58,7 +61,11 @@ NUMBERS = frozenset(("et", "ft"))
 
 
 @app.get("/np")
-def np(q: Optional[str] = None, case: Optional[str] = None, force_number: Optional[str] = None):
+def np(
+    q: Optional[str] = None,
+    case: Optional[str] = None,
+    force_number: Optional[str] = None,
+):
     """ Noun phrase declension API. """
     if not q:
         return _err("Missing query parameter")
@@ -103,32 +110,24 @@ _MAX_LEM_TXT_LEN = 4096
 
 
 @app.get("/lemmas")
-def lemmas(q: Optional[str] = None):
+def lemmas(
+    q: Optional[str] = None,
+):
     """ Lemmatization API. """
     if not q:
         return _err("Missing query parameter")
     if len(q) > _MAX_LEM_TXT_LEN:
         return _err(f"Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
 
-    lem: List[str] = list()
+    # Lazy-load Greynir engine
+    if not greynir:
+        greynir = Greynir()
 
-    # Consume from generator
-    for t in tokenize(q):
-        if t.kind in _SKIP_TOKENS:
-            continue
-        if not t.val:
-            lem.append(t.txt)
-        else:
-            m = t.val[0]
-            if hasattr(m, "stofn"):
-                lem.append(m.stofn.replace("-", ""))
-            elif hasattr(m, "name"):
-                # !!! Might want to split the name?
-                lem.append(m.name)
-            else:
-                lem.append(t.txt)
+    lem = list()
+    for m in greynir.lemmatize(q):
+        # TODO: postprocess
+        lem.add(m)
 
-    resp: Dict[str, Union[str, bool, List[str]]] = dict()
     resp["err"] = False
     resp["q"] = q
     resp["lemmas"] = lem
