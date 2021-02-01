@@ -2,7 +2,7 @@
 
 # GreynirAPI
 
-This web application provides a REST API for the Greynir NLP parser.
+This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir) Icelandic natural language processing toolkit.
 
 Implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
 
@@ -14,10 +14,10 @@ Create a Python virtual environment in the repository root (requires Python 3.6 
 [PyPy](https://pypi.org/) or CPython).
 
 ```
-$ virtualenv -p /path/to/python venv
+$ virtualenv -p /path/to/python3 venv
 ```
 
-Activate virtual environment:
+Activate the virtual environment:
 
 ```
 $ source venv/bin/activate
@@ -29,7 +29,14 @@ Install dependencies:
 $ pip install -r requirements.txt
 ```
 
+Install ASGI-compliant server (`uvicorn` is recommended):
+
+```
+$ pip install uvicorn
+```
+
 ## Running web application
+
 
 After activating the virtual environment, run the following command from the repository root:
 
@@ -44,6 +51,10 @@ $ uvicorn main:app --reload
 ```
 
 Defaults to running on [localhost:8000](http://localhost:8000)
+
+## Docker deployment
+
+TBD
 
 ## API documentation
 
