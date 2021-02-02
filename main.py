@@ -34,7 +34,7 @@ __version__ = 0.1
 
 
 app = FastAPI()
-greynir = None
+greynir: Greynir = None
 
 
 def _err(msg: str) -> Dict[str, Union[str, bool]]:
@@ -79,11 +79,9 @@ def np(
             f"Invalid force_number param: '{force_number}'. Valid numbers are: {', '.join(NUMBERS)}"
         )
 
-    resp: Dict[str, Union[str, bool, Dict[str, str]]] = {}
+    resp: Dict[str, Union[str, bool, Dict[str, str]]] = dict(q=q)
 
     try:
-        resp["q"] = q
-
         n = NounPhrase(q, force_number=force_number)
 
         cases: Dict[str, str] = dict()
@@ -97,10 +95,9 @@ def np(
             cases["ef"] = n.genitive
 
         resp["cases"] = cases
-    except Exception:
-        raise
-
-    resp["err"] = False
+        resp["err"] = False
+    except Exception as e:
+        return _err(f"Villa kom upp við fallbeygingu nafnliðs: '{e}'")
 
     return resp
 
@@ -110,26 +107,30 @@ _MAX_LEM_TXT_LEN = 4096
 
 
 @app.get("/lemmas")
-def lemmas(
-    q: Optional[str] = None,
-):
+def lemmas(q: Optional[str] = None, multiple: Optional[bool] = False):
     """ Lemmatization API. """
     if not q:
         return _err("Missing query parameter")
     if len(q) > _MAX_LEM_TXT_LEN:
         return _err(f"Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
+    print(multiple)
+
 
     # Lazy-load Greynir engine
+    global greynir
     if not greynir:
         greynir = Greynir()
 
-    lem = list()
-    for m in greynir.lemmatize(q):
-        # TODO: postprocess
-        lem.add(m)
+    resp: Dict[str, List] = dict(q=q)
+    try:
+        lem = list()
+        for m in greynir.lemmatize(q, multiple=multiple):
+            # TODO: postprocess in some way?
+            lem.append(m)
 
-    resp["err"] = False
-    resp["q"] = q
-    resp["lemmas"] = lem
+        resp["err"] = False
+        resp["lemmas"] = lem
+    except Exception as e:
+        return _err(f"Villa kom upp við lemmun texta: '{e}'");
 
     return resp
