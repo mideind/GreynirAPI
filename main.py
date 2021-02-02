@@ -27,7 +27,7 @@ from typing import List, Dict, Union, Optional
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from reynir import Greynir, NounPhrase, tokenize, TOK
+from reynir import Greynir, NounPhrase
 
 
 __version__ = 0.1
