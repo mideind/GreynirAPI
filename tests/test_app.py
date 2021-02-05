@@ -21,8 +21,17 @@
 
 """
 
+import os
+import sys
 from urllib.parse import urlencode
 from fastapi.testclient import TestClient
+
+# Hack to make this Python program executable from the tools subdirectory
+basepath, _ = os.path.split(os.path.realpath(__file__))
+if basepath.endswith("/tests") or basepath.endswith("\\tests"):
+    basepath = basepath[0:-6]
+    sys.path.append(basepath)
+
 from main import app
 
 
