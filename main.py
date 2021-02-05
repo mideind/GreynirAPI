@@ -27,7 +27,7 @@ from typing import List, Dict, Union, Optional
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from reynir import Greynir, NounPhrase
+from reynir import Greynir, NounPhrase, TOK
 
 
 __version__ = 0.1
@@ -57,7 +57,7 @@ def root():
 
 
 CASES = {"nf": "nominative", "þf": "accusative", "þgf": "dative", "ef": "genitive"}
-NUMBERS = frozenset(("et", "ft"))
+SING_OR_PLUR = frozenset(("et", "ft"))
 
 
 @app.get("/np")
@@ -70,11 +70,10 @@ def np(
     if not q:
         return _err("Missing query parameter")
 
-    ckeys = CASES.keys()
-    if case and case not in ckeys:
-        return _err(f"Invalid case: '{case}'. Valid cases are: {', '.join(ckeys)}")
+    if case and case not in CASES.keys():
+        return _err(f"Invalid case: '{case}'. Valid cases are: {', '.join(CASES.keys())}")
 
-    if force_number and force_number not in NUMBERS:
+    if force_number and force_number not in SING_OR_PLUR:
         return _err(
             f"Invalid force_number param: '{force_number}'. Valid numbers are: {', '.join(NUMBERS)}"
         )
@@ -97,13 +96,13 @@ def np(
         resp["cases"] = cases
         resp["err"] = False
     except Exception as e:
-        return _err(f"Villa kom upp við fallbeygingu nafnliðs: '{e}'")
+        raise
+        #return _err(f"Villa kom upp við fallbeygingu nafnliðs: '{e}'")
 
     return resp
 
 
-_SKIP_TOKENS = frozenset((TOK.S_BEGIN, TOK.S_END, TOK.PUNCTUATION))
-_MAX_LEM_TXT_LEN = 4096
+_MAX_LEMMAS_TXT_LEN = 8192
 
 
 @app.get("/lemmas")
@@ -111,10 +110,8 @@ def lemmas(q: Optional[str] = None, multiple: Optional[bool] = False):
     """ Lemmatization API. """
     if not q:
         return _err("Missing query parameter")
-    if len(q) > _MAX_LEM_TXT_LEN:
-        return _err(f"Param exceeds max length ({_MAX_LEM_TXT_LEN} chars)")
-    print(multiple)
-
+    if len(q) > _MAX_LEMMAS_TXT_LEN:
+        return _err(f"Param exceeds max length ({_MAX_LEMMAS_TXT_LEN} chars)")
 
     # Lazy-load Greynir engine
     global greynir

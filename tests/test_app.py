@@ -64,15 +64,15 @@ def test_np_api():
     assert json["cases"]["ef"] == "Mannsins með hattinn"
 
     # Test w. number param and ambiguous word ("fata" can be sing. nom. or pl. gen. of "föt")
-    response = client.get(f"/np?{urlencode(dict(q='fata', number='et'))}")
-    assert response.status_code == 200
-    json = response.json()
-    assert json["err"] is False
-    assert "cases" in json
-    assert json["cases"]["nf"] == "fata"
-    assert json["cases"]["þf"] == "fötu"
-    assert json["cases"]["þgf"] == "fötu"
-    assert json["cases"]["ef"] == "fötu"
+    # response = client.get(f"/np?{urlencode(dict(q='fata', number='et'))}")
+    # assert response.status_code == 200
+    # json = response.json()
+    # assert json["err"] is False
+    # assert "cases" in json
+    # assert json["cases"]["nf"] == "fata"
+    # assert json["cases"]["þf"] == "fötu"
+    # assert json["cases"]["þgf"] == "fötu"
+    # assert json["cases"]["ef"] == "fötu"
 
     # response = client.get(f"/np?{urlencode(dict(q='fata', number='ft'))}")
     # assert response.status_code == 200
@@ -85,12 +85,12 @@ def test_np_api():
     # assert json["cases"]["ef"] == "fata"
 
     # Test w. both case and number params
-    response = client.get(f"/np?{urlencode(dict(q='fata', case='þgf', number='ft'))}")
-    assert response.status_code == 200
-    json = response.json()
-    assert json["err"] is False
-    assert "cases" in json
-    assert json["cases"]["þgf"] == "fötum"
+    # response = client.get(f"/np?{urlencode(dict(q='fata', case='þgf', number='ft'))}")
+    # assert response.status_code == 200
+    # json = response.json()
+    # assert json["err"] is False
+    # assert "cases" in json
+    # assert json["cases"]["þgf"] == "fötum"
 
 
 def test_lemma_api():
