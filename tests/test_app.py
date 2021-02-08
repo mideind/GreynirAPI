@@ -6,27 +6,37 @@
 
     Copyright (C) 2020 Miðeind ehf.
 
-       This program is free software: you can redistribute it and/or modify
-       it under the terms of the GNU General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
-       This program is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-       GNU General Public License for more details.
+    This software is licensed under the MIT License:
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see http://www.gnu.org/licenses/.
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
+        subject to the following conditions:
 
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
+
+from typing import Dict, Any
 
 import os
 import sys
 from urllib.parse import urlencode
 from fastapi.testclient import TestClient
 
-# Hack to make this Python program executable from the tools subdirectory
+# Hack to make this Python program executable from the tests subdirectory
 basepath, _ = os.path.split(os.path.realpath(__file__))
 if basepath.endswith("/tests") or basepath.endswith("\\tests"):
     basepath = basepath[0:-6]
@@ -38,22 +48,22 @@ from main import app
 client = TestClient(app)
 
 
-def test_np_api():
+def test_np_api() -> None:
     """ Test noun phrase API ("/np" route). """
 
     # Test without params
-    response = client.get("/np")
+    response = client.get("/np")  # type: ignore
     assert response.status_code == 200
-    json = response.json()
+    json: Dict[str, Any] = response.json()  # type: ignore
     assert json["err"] is True
     assert json["errmsg"]
 
     # Test w. just noun phrase param
     n = "Maðurinn með hattinn"
 
-    response = client.get(f"/np?{urlencode(dict(q=n))}")
+    response = client.get(f"/np?{urlencode(dict(q=n))}")  # type: ignore
     assert response.status_code == 200
-    json = response.json()
+    json = response.json()  # type: ignore
     assert json["err"] is False
     assert "cases" in json
     assert json["cases"]["nf"] == n
@@ -62,9 +72,9 @@ def test_np_api():
     assert json["cases"]["ef"] == "Mannsins með hattinn"
 
     # Test w. case param
-    response = client.get(f"/np?{urlencode(dict(q=n, case='ef'))}")
+    response = client.get(f"/np?{urlencode(dict(q=n, case='ef'))}")  # type: ignore
     assert response.status_code == 200
-    json = response.json()
+    json = response.json()  # type: ignore
     assert json["err"] is False
     assert "cases" in json
     assert "nf" not in json["cases"]
@@ -72,35 +82,114 @@ def test_np_api():
     assert "þgf" not in json["cases"]
     assert json["cases"]["ef"] == "Mannsins með hattinn"
 
-    # Test w. number param and ambiguous word ("fata" can be sing. nom. or pl. gen. of "föt")
-    # response = client.get(f"/np?{urlencode(dict(q='fata', number='et'))}")
-    # assert response.status_code == 200
-    # json = response.json()
-    # assert json["err"] is False
-    # assert "cases" in json
-    # assert json["cases"]["nf"] == "fata"
-    # assert json["cases"]["þf"] == "fötu"
-    # assert json["cases"]["þgf"] == "fötu"
-    # assert json["cases"]["ef"] == "fötu"
+    # Test w. just noun phrase param
+    n = "Laugavegur 22"
 
-    # response = client.get(f"/np?{urlencode(dict(q='fata', number='ft'))}")
-    # assert response.status_code == 200
-    # json = response.json()
-    # assert json["err"] is False
-    # assert "cases" in json
-    # assert json["cases"]["nf"] == "föt"
-    # assert json["cases"]["þf"] == "föt"
-    # assert json["cases"]["þgf"] == "fötum"
-    # assert json["cases"]["ef"] == "fata"
+    response = client.get(f"/np?{urlencode(dict(q=n))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "cases" in json
+    assert json["cases"]["nf"] == n
+    assert json["cases"]["þf"] == "Laugaveg 22"
+    assert json["cases"]["þgf"] == "Laugavegi 22"
+    assert json["cases"]["ef"] == "Laugavegar 22"
+
+    # Test w. just noun phrase param
+    n = "Húsið norðanmegin við bensínstöðina ofarlega í bænum"
+
+    response = client.get(f"/np?{urlencode(dict(q=n))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "cases" in json
+    assert json["cases"]["nf"] == n
+    assert json["cases"]["þf"] == n
+    assert json["cases"]["þgf"] == "Húsinu norðanmegin við bensínstöðina ofarlega í bænum"
+    assert json["cases"]["ef"] == "Hússins norðanmegin við bensínstöðina ofarlega í bænum"
+
+    # Test w. number param and ambiguous word ("fata" can be sing. nom. or pl. gen. of "föt")
+    response = client.get(f"/np?{urlencode(dict(q='fata', force_number='et'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "cases" in json
+    assert json["cases"]["nf"] == "fata"
+    assert json["cases"]["þf"] == "fötu"
+    assert json["cases"]["þgf"] == "fötu"
+    assert json["cases"]["ef"] == "fötu"
+
+    response = client.get(f"/np?{urlencode(dict(q='fata', force_number='ft'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "cases" in json
+    assert json["cases"]["nf"] in {"föt", "fötur"}
+    assert json["cases"]["þf"] in {"föt", "fötur"}
+    assert json["cases"]["þgf"] == "fötum"
+    assert json["cases"]["ef"] in {"fata", "fatna"}
 
     # Test w. both case and number params
-    # response = client.get(f"/np?{urlencode(dict(q='fata', case='þgf', number='ft'))}")
-    # assert response.status_code == 200
-    # json = response.json()
-    # assert json["err"] is False
-    # assert "cases" in json
-    # assert json["cases"]["þgf"] == "fötum"
+    response = client.get(f"/np?{urlencode(dict(q='fata', case='þgf', force_number='ft'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "cases" in json
+    assert json["cases"]["þgf"] == "fötum"
 
 
-def test_lemma_api():
-    pass
+def test_lemma_api() -> None:
+    # Test call with no params
+    response = client.get("/lemmas")  # type: ignore
+    assert response.status_code == 422
+
+    response = client.get(f"/lemmas?{urlencode(dict(q='hamborgari með frönskum og kokteilsósu'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "lemmas" in json
+    assert json["lemmas"] == [
+        ["hamborgari", "kk"],
+        ["með", "fs"],
+        ["franska", "kvk"],
+        ["og", "st"],
+        ["kokteilsósa", "kvk"],
+    ]
+
+    # Test compound words that are not in BÍN
+    response = client.get(f"/lemmas?{urlencode(dict(q='svakahamborgari með saltfrönskum og slummukokteilsósu'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "lemmas" in json
+    assert json["lemmas"] == [
+        ["svakahamborgari", "kk"],
+        ["með", "fs"],
+        ["saltfranska", "kvk"],
+        ["og", "st"],
+        ["slummukokteilsósa", "kvk"],
+    ]
+
+    response = client.get(f"/lemmas?{urlencode(dict(q='Hamborgari MEÐ frönskum Og kokteilsósu'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "lemmas" in json
+    assert json["lemmas"] == [
+        ["hamborgari", "kk"],
+        ["með", "fs"],
+        ["franska", "kvk"],
+        ["og", "st"],
+        ["kokteilsósa", "kvk"],
+    ]
+
+    response = client.get(f"/lemmas?{urlencode(dict(q='skýrslu um Jón Sigurðsson, 1900-2000'))}")  # type: ignore
+    assert response.status_code == 200
+    json = response.json()  # type: ignore
+    assert json["err"] is False
+    assert "lemmas" in json
+    assert json["lemmas"] == [
+        ["skýrsla", "kvk"],
+        ["um", "fs"],
+        ["Jón Sigurðsson", "person_kk"],
+    ]

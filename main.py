@@ -5,44 +5,52 @@
 
     Copyright (C) 2021 Miðeind ehf.
 
-       This program is free software: you can redistribute it and/or modify
-       it under the terms of the GNU General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
-       This program is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-       GNU General Public License for more details.
+    This software is licensed under the MIT License:
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see http://www.gnu.org/licenses/.
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
+        subject to the following conditions:
 
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     Main web application module
 
 """
 
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Union, Optional, Any
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import Response, JSONResponse, HTMLResponse
 
-from reynir import Greynir, NounPhrase, TOK
+from reynir import Greynir, NounPhrase
 
 
 __version__ = 0.1
 
 
 app = FastAPI()
-greynir: Greynir = None
+greynir: Optional[Greynir] = None
 
 
-def _err(msg: str) -> Dict[str, Union[str, bool]]:
-    return {"err": True, "errmsg": msg}
+def _err(msg: str) -> JSONResponse:
+    return JSONResponse(content={"err": True, "errmsg": msg})
 
 
-@app.get("/", response_class=HTMLResponse)
-def root():
+@app.get("/", response_class=HTMLResponse)  # type: ignore
+def root() -> str:
     return """
 <html>
     <head><title>Greynir API Server v{0}</title></head>
@@ -57,16 +65,16 @@ def root():
 
 
 CASES = {"nf": "nominative", "þf": "accusative", "þgf": "dative", "ef": "genitive"}
-SING_OR_PLUR = frozenset(("et", "ft"))
+SING_OR_PLUR = frozenset(("et", "ft", "singular", "plural"))
 
 
-@app.get("/np")
+@app.get("/np")  # type: ignore
 def np(
-    q: Optional[str] = None,
+    q: str,
     case: Optional[str] = None,
     force_number: Optional[str] = None,
-):
-    """ Noun phrase declension API. """
+) -> Response:
+    """ Noun phrase declension API """
     if not q:
         return _err("Missing query parameter")
 
@@ -75,38 +83,50 @@ def np(
 
     if force_number and force_number not in SING_OR_PLUR:
         return _err(
-            f"Invalid force_number param: '{force_number}'. Valid numbers are: {', '.join(NUMBERS)}"
+            f"Invalid force_number parameter: '{force_number}'. Valid numbers are: {', '.join(SING_OR_PLUR)}"
         )
 
     resp: Dict[str, Union[str, bool, Dict[str, str]]] = dict(q=q)
 
+    kwargs: Dict[str, Any] = dict()
+    if force_number:
+        kwargs["force_number"] = force_number
+
     try:
-        n = NounPhrase(q, force_number=force_number)
+        n = NounPhrase(q, **kwargs)
 
         cases: Dict[str, str] = dict()
         if case:
             cases[case] = getattr(n, CASES[case])
         else:
             # Default to returning all cases
-            cases["nf"] = n.nominative
-            cases["þf"] = n.accusative
-            cases["þgf"] = n.dative
-            cases["ef"] = n.genitive
+            c: Optional[str] = n.nominative
+            if c is not None:
+                cases["nf"] = c
+            c = n.accusative
+            if c is not None:
+                cases["þf"] = c
+            c = n.dative
+            if c is not None:
+                cases["þgf"] = c
+            c = n.genitive
+            if c is not None:
+                cases["ef"] = c
 
         resp["cases"] = cases
         resp["err"] = False
-    except Exception as e:
+    except Exception as _:
         raise
-        #return _err(f"Villa kom upp við fallbeygingu nafnliðs: '{e}'")
+        #return _err(f"Villa kom upp við fallbeygingu nafnliðar: '{e}'")
 
-    return resp
+    return JSONResponse(content=resp)
 
 
 _MAX_LEMMAS_TXT_LEN = 8192
 
 
-@app.get("/lemmas")
-def lemmas(q: Optional[str] = None, multiple: Optional[bool] = False):
+@app.get("/lemmas")  # type: ignore
+def lemmas(q: str, all_lemmas: bool = False) -> Response:
     """ Lemmatization API. """
     if not q:
         return _err("Missing query parameter")
@@ -115,19 +135,18 @@ def lemmas(q: Optional[str] = None, multiple: Optional[bool] = False):
 
     # Lazy-load Greynir engine
     global greynir
-    if not greynir:
+    if greynir is None:
         greynir = Greynir()
 
-    resp: Dict[str, List] = dict(q=q)
+    resp: Dict[str, Any] = dict(q=q)
     try:
-        lem = list()
-        for m in greynir.lemmatize(q, multiple=multiple):
+        lem: List[Any] = []
+        for m in greynir.lemmatize(q, all_lemmas=all_lemmas):
             # TODO: postprocess in some way?
             lem.append(m)
-
         resp["err"] = False
         resp["lemmas"] = lem
     except Exception as e:
         return _err(f"Villa kom upp við lemmun texta: '{e}'");
 
-    return resp
+    return JSONResponse(content=resp)

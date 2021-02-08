@@ -73,3 +73,6 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# Visual Studio Code stuff
+.vscode/
+*.code-workspace

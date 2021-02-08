@@ -1,17 +1,18 @@
+
 <img src="static/logo.png" alt="Greynir" width="200" height="200" align="right" style="margin-left:20px; margin-bottom: 20px;">
 
 # GreynirAPI
 
-This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir) Icelandic natural language processing toolkit.
+This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir) Icelandic natural language processing engine.
 
-Implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
+The API is implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
 
-Runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
+It runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
 
 ## Setup
 
-Create a Python virtual environment in the repository root (requires Python 3.6 or later, either
-[PyPy](https://pypi.org/) or CPython).
+Create a Python virtual environment in the repository root (requires
+Python 3.6 or later, either [PyPy](https://pypi.org/) or CPython).
 
 ```
 $ virtualenv -p /path/to/python3 venv
@@ -37,7 +38,6 @@ $ pip install uvicorn
 
 ## Running web application
 
-
 After activating the virtual environment, run the following command from the repository root:
 
 ```
@@ -62,7 +62,7 @@ Visit `/docs` to view the auto-generated API documentation
 
 ## License
 
-GreynirAPI is Copyright © 2021 [Miðeind ehf.](https://mideind.is)
+GreynirAPI is copyright © 2021 [Miðeind ehf.](https://mideind.is)
 
 This software is licensed under the *MIT License*:
 
