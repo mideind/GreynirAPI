@@ -144,6 +144,7 @@ def test_lemma_api() -> None:
     response = client.get(f"/lemmas?{urlencode(d)}")  # type: ignore
     assert response.status_code == 200
     json = response.json()  # type: ignore
+    assert json.get("errmsg", "") == ""
     assert json["err"] is False
     assert "lemmas" in json
     assert json["lemmas"] == [
