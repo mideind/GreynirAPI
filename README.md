@@ -3,6 +3,8 @@
 
 # GreynirAPI
 
+![Python application](https://github.com/mideind/GreynirAPI/workflows/Python%20application/badge.svg)
+
 This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir) Icelandic natural language processing engine.
 
 The API is implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
