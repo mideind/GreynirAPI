@@ -53,10 +53,7 @@ def test_np_api() -> None:
 
     # Test without params
     response = client.get("/np")  # type: ignore
-    assert response.status_code == 200
-    json: Dict[str, Any] = response.json()  # type: ignore
-    assert json["err"] is True
-    assert json["errmsg"]
+    assert response.status_code == 422
 
     # Test w. just noun phrase param
     n = "Maðurinn með hattinn"
