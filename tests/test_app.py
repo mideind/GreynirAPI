@@ -29,7 +29,7 @@
 
 """
 
-from typing import Dict, Any
+from typing import Dict
 
 import os
 import sys
@@ -140,7 +140,8 @@ def test_lemma_api() -> None:
     response = client.get("/lemmas")  # type: ignore
     assert response.status_code == 422
 
-    response = client.get(f"/lemmas?{urlencode(dict(q='hamborgari með frönskum og kokteilsósu'))}")  # type: ignore
+    d: Dict[str, str] = dict(q='hamborgari með frönskum og kokteilsósu')
+    response = client.get(f"/lemmas?{urlencode(d)}")  # type: ignore
     assert response.status_code == 200
     json = response.json()  # type: ignore
     assert json["err"] is False
@@ -154,7 +155,8 @@ def test_lemma_api() -> None:
     ]
 
     # Test compound words that are not in BÍN
-    response = client.get(f"/lemmas?{urlencode(dict(q='svakahamborgari með saltfrönskum og slummukokteilsósu'))}")  # type: ignore
+    d = dict(q='svakahamborgari með saltfrönskum og slummukokteilsósu')
+    response = client.get(f"/lemmas?{urlencode(d)}")  # type: ignore
     assert response.status_code == 200
     json = response.json()  # type: ignore
     assert json["err"] is False
@@ -167,7 +169,8 @@ def test_lemma_api() -> None:
         ["slummukokteilsósa", "kvk"],
     ]
 
-    response = client.get(f"/lemmas?{urlencode(dict(q='Hamborgari MEÐ frönskum Og kokteilsósu'))}")  # type: ignore
+    d = dict(q='Hamborgari MEÐ frönskum Og kokteilsósu')
+    response = client.get(f"/lemmas?{urlencode(d)}")  # type: ignore
     assert response.status_code == 200
     json = response.json()  # type: ignore
     assert json["err"] is False
@@ -180,7 +183,8 @@ def test_lemma_api() -> None:
         ["kokteilsósa", "kvk"],
     ]
 
-    response = client.get(f"/lemmas?{urlencode(dict(q='skýrslu um Jón Sigurðsson, 1900-2000'))}")  # type: ignore
+    d = dict(q='skýrslu um Jón Sigurðsson, 1900-2000')
+    response = client.get(f"/lemmas?{urlencode(d)}")  # type: ignore
     assert response.status_code == 200
     json = response.json()  # type: ignore
     assert json["err"] is False
