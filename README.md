@@ -5,7 +5,8 @@
 
 ![Python application](https://github.com/mideind/GreynirAPI/workflows/Python%20application/badge.svg)
 
-This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir) Icelandic natural language processing engine.
+This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir)
+Icelandic natural language processing engine.
 
 The API is implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
 
@@ -13,8 +14,8 @@ It runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
 
 ## Setup
 
-Create a Python virtual environment in the repository root (requires
-Python 3.6 or later, either [PyPy](https://pypi.org/) or CPython).
+Create a Python virtual environment in the repository root. Requires Python 3.6 or later, either
+[PyPy](https://pypi.org/) or CPython, with the former recommended for performance reasons:
 
 ```
 $ virtualenv -p /path/to/python3 venv
@@ -56,7 +57,8 @@ Defaults to running on [localhost:8000](http://localhost:8000)
 
 ## Docker deployment
 
-To run GreynirAPI via [Docker](https://www.docker.com/) you need to build a Docker container from the repo root:
+To run GreynirAPI via [Docker](https://www.docker.com/) you need to build a Docker container from
+the repo root:
 
 ```
 $ docker build -t greynir/api .
@@ -68,8 +70,9 @@ And then run the container.
 $ docker run -d --name greynir_api -p 8080:8080 greynir/api
 ```
 
-This will expose the Greynir API at [localhost:8080](http://localhost:8080). To expose the API at some other
-port, e.g. port `80`, replace the second port number following the `-p` flag with your port of choice, e.g.:
+This will expose the Greynir API at [localhost:8080](http://localhost:8080). To expose the API at
+some other port, e.g. port `80`, replace the second port number following the `-p` flag with your
+port of choice, e.g.:
 
 
 ```
@@ -81,6 +84,8 @@ $ docker run -d --name greynir_api -p 8080:80 greynir/api
 Visit `/docs` to view the auto-generated API documentation
 
 ## License
+
+<a href="https://mideind.is"><img src="static/mideind_logo.png" alt="Miðeind ehf." width="214" height="66" align="right" style="margin-left:20px; margin-bottom: 20px;"></a>
 
 GreynirAPI is copyright © 2021 [Miðeind ehf.](https://mideind.is)
 
