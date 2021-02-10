@@ -1,4 +1,4 @@
-FROM pypy:3
+FROM pypy:3.7-7.3.3-slim
 
 # Update aptitude with new repo and install software 
 RUN apt-get update \
