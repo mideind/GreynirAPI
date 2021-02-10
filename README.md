@@ -56,9 +56,27 @@ Defaults to running on [localhost:8000](http://localhost:8000)
 
 ## Docker deployment
 
-TBD
+To run GreynirAPI via [Docker](https://www.docker.com/) you need to build a Docker container from the repo root:
 
-## API documentation
+```
+$ docker build -t greynir/api .
+```
+
+And then run the container.
+
+```
+$ docker run -d --name greynir_api -p 8080:8080 greynir/api
+```
+
+This will expose the Greynir API at [localhost:8080](http://localhost:8080). To expose the API at some other
+port, e.g. port `80`, replace the second port number following the `-p` flag with your port of choice, e.g.:
+
+
+```
+$ docker run -d --name greynir_api -p 8080:80 greynir/api
+```
+
+## REST API documentation
 
 Visit `/docs` to view the auto-generated API documentation
 
