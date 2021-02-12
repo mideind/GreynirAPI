@@ -4,7 +4,7 @@
 
     Tests for web application
 
-    Copyright (C) 2020 Miðeind ehf.
+    Copyright (C) 2021 Miðeind ehf.
 
     This software is licensed under the MIT License:
 
@@ -136,6 +136,8 @@ def test_np_api() -> None:
 
 
 def test_lemma_api() -> None:
+    """ Test lemmatization API ("/lemmas" route). """
+
     # Test call with no params
     response = client.get("/lemmas")  # type: ignore
     assert response.status_code == 422

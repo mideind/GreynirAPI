@@ -5,10 +5,10 @@
 
 ![Python application](https://github.com/mideind/GreynirAPI/workflows/Python%20application/badge.svg)
 
-This web application provides a REST API for the [Greynir](https://github.com/mideind/Greynir)
+This web application provides a REST API for the [Greynir](https://github.com/mideind/GreynirPackage)
 Icelandic natural language processing engine.
 
-The API is implemented in Python 3.6+ using the [FastAPI](https://fastapi.tiangolo.com/) framework.
+The API is implemented in Python 3 using the [FastAPI](https://fastapi.tiangolo.com/) framework.
 
 It runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
 
@@ -53,7 +53,7 @@ or if in development mode:
 $ uvicorn main:app --reload
 ```
 
-Defaults to running on [localhost:8000](http://localhost:8000)
+Defaults to running on [localhost:8000](http://localhost:8000).
 
 ## Docker deployment
 
