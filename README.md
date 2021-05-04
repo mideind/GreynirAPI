@@ -1,9 +1,10 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Python 3.6+](https://img.shields.io/badge/python-3.6-blue.svg)
+![Python application](https://github.com/mideind/GreynirAPI/workflows/Python%20application/badge.svg)
 
 <img src="static/logo.png" alt="Greynir" width="200" height="200" align="right" style="margin-left:20px; margin-bottom: 20px;">
 
 # GreynirAPI
-
-![Python application](https://github.com/mideind/GreynirAPI/workflows/Python%20application/badge.svg)
 
 This web application provides a REST API for the [Greynir](https://github.com/mideind/GreynirPackage)
 Icelandic natural language processing engine.
@@ -14,8 +15,8 @@ It runs via [uvicorn](https://www.uvicorn.org/) or any ASGI-compliant server.
 
 ## Setup
 
-Create a Python virtual environment in the repository root. Requires Python 3.6 or later, either
-[PyPy](https://pypi.org/) or CPython, with the former recommended for performance reasons:
+Requires Python 3.6 or later, either [PyPy](https://pypi.org/) or CPython, with the former being
+recommended for performance reasons. Create a Python virtual environment in the repository root:
 
 ```
 $ virtualenv -p /path/to/python3 venv
